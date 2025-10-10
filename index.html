@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bảng điều khiển ESP8266</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 40px;
+    }
+    h1 { color: #007BFF; }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      display: inline-block;
+      min-width: 300px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #007BFF;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button.off { background: #dc3545; }
+    #counter {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 15px 0;
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <h1>Điều khiển ESP8266 qua Firebase</h1>
+  <div class="card">
+    <h2>Số đếm cảm biến</h2>
+    <div id="counter">0</div>
+
+    <h3>Điều khiển Quạt / LED</h3>
+    <button id="btnOn">BẬT</button>
+    <button id="btnOff" class="off">TẮT</button>
+
+    <h3>Reset bộ đếm</h3>
+    <button id="btnReset">RESET</button>
+  </div>
+
+  <script>
+    // ⚙️ Cấu hình Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-YOUR_KEY",
+      authDomain: "diep-755df.firebaseapp.com",
+      databaseURL: "https://diep-755df-default-rtdb.firebaseio.com",
+      projectId: "diep-755df",
+      storageBucket: "diep-755df.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 🔁 Theo dõi giá trị bộ đếm
+    db.ref("dem").on("value", (snapshot) => {
+      document.getElementById("counter").innerText = snapshot.val();
+    });
+
+    // 💡 Bật / Tắt quạt
+    document.getElementById("btnOn").onclick = () => db.ref("led").set(0);
+    document.getElementById("btnOff").onclick = () => db.ref("led").set(1);
+
+    // 🔄 Reset bộ đếm
+    document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
+  </script>
+</body>
+</html>
