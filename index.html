@@ -77,8 +77,8 @@
     });
 
     // 💡 Bật / Tắt quạt
-    document.getElementById("btnOn").onclick = () => db.ref("led").set(0);
-    document.getElementById("btnOff").onclick = () => db.ref("led").set(1);
+    document.getElementById("btnOn").onclick = () => db.ref("led").set(1);
+    document.getElementById("btnOff").onclick = () => db.ref("led").set(0);
 
     // 🔄 Reset bộ đếm
     document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
