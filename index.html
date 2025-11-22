@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bảng điều khiển phân loại</title>
+  <title>Bảng điều khiển ESP8266</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
@@ -14,7 +14,7 @@
       margin: 0;
       padding: 40px;
     }
-    h1 { color: #007BFF; margin-bottom: 20px; }
+    h1 { color: #007BFF; }
     .card {
       background: #fff;
       border-radius: 10px;
@@ -22,18 +22,7 @@
       padding: 20px;
       display: inline-block;
       min-width: 300px;
-      margin-bottom: 20px;
-    }
-    .status {
-      font-size: 20px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-    .counter {
-      font-size: 36px;
-      font-weight: bold;
-      color: #28a745;
-      margin: 10px 0 20px 0;
+      margin: 10px;
     }
     button {
       padding: 10px 20px;
@@ -46,31 +35,34 @@
       cursor: pointer;
     }
     button.off { background: #dc3545; }
+    #counter, #counter2 {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 15px 0;
+      color: #28a745;
+    }
   </style>
 </head>
 <body>
-  <h1>Bảng điều khiển phân loại</h1>
+  <h1>NGUYỄN ĐÌNH ĐIỆP</h1>
 
+  <!-- Card Box 1 -->
   <div class="card">
-    <h2>Box 1</h2>
-    <div class="counter" id="box1Counter">0</div>
-  </div>
+    <h2>Số đếm cảm biến Box 1</h2>
+    <div id="counter">0</div>
 
-  <div class="card">
-    <h2>Box 2</h2>
-    <div class="counter" id="box2Counter">0</div>
-  </div>
+    <h3>Điều khiển LED</h3>
+    <button id="btnOn">BẬT</button>
+    <button id="btnOff" class="off">TẮT</button>
 
-  <div class="card">
-    <h2>Trạng thái cửa</h2>
-    <div class="status" id="doorStatus">Đang tắt</div>
-    <button id="btnOpen">MỞ CỬA</button>
-    <button id="btnClose" class="off">ĐÓNG CỬA</button>
-  </div>
-
-  <div class="card">
-    <h2>Reset bộ đếm</h2>
+    <h3>Reset bộ đếm</h3>
     <button id="btnReset">RESET</button>
+  </div>
+
+  <!-- Card Box 2 -->
+  <div class="card">
+    <h2>Số đếm cảm biến Box 2</h2>
+    <div id="counter2">0</div>
   </div>
 
   <script>
@@ -88,27 +80,19 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 🔁 Theo dõi số lượng Box1 & Box2
+    // 🔁 Theo dõi giá trị bộ đếm Box 1
     db.ref("box1").on("value", (snapshot) => {
-      document.getElementById("box1Counter").innerText = snapshot.val() || 0;
+      document.getElementById("counter").innerText = snapshot.val();
     });
 
+    // 🔁 Theo dõi giá trị bộ đếm Box 2
     db.ref("box2").on("value", (snapshot) => {
-      document.getElementById("box2Counter").innerText = snapshot.val() || 0;
+      document.getElementById("counter2").innerText = snapshot.val();
     });
 
-    // 🔁 Theo dõi trạng thái cửa (1 = mở, 0 = đóng)
-    db.ref("door").on("value", (snapshot) => {
-      const state = snapshot.val();
-      const statusEl = document.getElementById("doorStatus");
-      if (state == 1) statusEl.innerText = "Đang mở";
-      else if (state == 0) statusEl.innerText = "Đang đóng";
-      else statusEl.innerText = "Không xác định";
-    });
-
-    // 💡 Điều khiển cửa
-    document.getElementById("btnOpen").onclick = () => db.ref("door").set(1);
-    document.getElementById("btnClose").onclick = () => db.ref("door").set(0);
+    // 💡 Bật / Tắt LED
+    document.getElementById("btnOn").onclick = () => db.ref("door").set(1);
+    document.getElementById("btnOff").onclick = () => db.ref("door").set(0);
 
     // 🔄 Reset bộ đếm
     document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
