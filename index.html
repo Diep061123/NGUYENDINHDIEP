@@ -22,7 +22,6 @@
       padding: 20px;
       display: inline-block;
       min-width: 300px;
-      margin: 10px;
     }
     button {
       padding: 10px 20px;
@@ -35,7 +34,7 @@
       cursor: pointer;
     }
     button.off { background: #dc3545; }
-    #counter, #counter2 {
+    #counter {
       font-size: 32px;
       font-weight: bold;
       margin: 15px 0;
@@ -45,10 +44,8 @@
 </head>
 <body>
   <h1>NGUYỄN ĐÌNH ĐIỆP</h1>
-
-  <!-- Card Box 1 -->
   <div class="card">
-    <h2>Số đếm cảm biến Box 1</h2>
+    <h2>Số đếm cảm biến</h2>
     <div id="counter">0</div>
 
     <h3>Điều khiển LED</h3>
@@ -57,12 +54,6 @@
 
     <h3>Reset bộ đếm</h3>
     <button id="btnReset">RESET</button>
-  </div>
-
-  <!-- Card Box 2 -->
-  <div class="card">
-    <h2>Số đếm cảm biến Box 2</h2>
-    <div id="counter2">0</div>
   </div>
 
   <script>
@@ -80,19 +71,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 🔁 Theo dõi giá trị bộ đếm Box 1
-    db.ref("box1").on("value", (snapshot) => {
+    // 🔁 Theo dõi giá trị bộ đếm
+    db.ref("dem").on("value", (snapshot) => {
       document.getElementById("counter").innerText = snapshot.val();
     });
 
-    // 🔁 Theo dõi giá trị bộ đếm Box 2
-    db.ref("box2").on("value", (snapshot) => {
-      document.getElementById("counter2").innerText = snapshot.val();
-    });
-
-    // 💡 Bật / Tắt LED
-    document.getElementById("btnOn").onclick = () => db.ref("door").set(1);
-    document.getElementById("btnOff").onclick = () => db.ref("door").set(0);
+    // 💡 Bật / Tắt quạt
+    document.getElementById("btnOn").onclick = () => db.ref("led").set(1);
+    document.getElementById("btnOff").onclick = () => db.ref("led").set(0);
 
     // 🔄 Reset bộ đếm
     document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
