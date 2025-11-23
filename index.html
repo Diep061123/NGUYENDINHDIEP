@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bảng điều khiển ESP8266</title>
+  <title>Bảng điều khiển ESP32</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
@@ -21,11 +21,12 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       padding: 20px;
       display: inline-block;
-      min-width: 300px;
+      min-width: 320px;
+      margin-bottom: 20px;
     }
     button {
       padding: 10px 20px;
-      margin: 10px;
+      margin: 5px;
       border: none;
       border-radius: 6px;
       background: #007BFF;
@@ -34,32 +35,52 @@
       cursor: pointer;
     }
     button.off { background: #dc3545; }
-    #counter {
-      font-size: 32px;
+    button.mode { width: 100px; }
+    #counter1, #counter2 {
+      font-size: 28px;
       font-weight: bold;
-      margin: 15px 0;
+      margin: 10px 0;
       color: #28a745;
     }
+    .section { margin-bottom: 20px; }
   </style>
 </head>
 <body>
-  <h1>NGUYỄN ĐÌNH ĐIỆP</h1>
-  <div class="card">
-    <h2>Số đếm cảm biến</h2>
-    <div id="counter">0</div>
+  <h1>Bảng điều khiển ESP32 - NGUYỄN ĐÌNH ĐIỆP</h1>
 
-    <h3>Điều khiển LED</h3>
-    <button id="btnOn">BẬT</button>
-    <button id="btnOff" class="off">TẮT</button>
+  <div class="card section">
+    <h2>Chế độ hoạt động</h2>
+    <button id="btnAuto" class="mode">AUTO</button>
+    <button id="btnManual" class="mode off">MANUAL</button>
+  </div>
 
-    <h3>Reset bộ đếm</h3>
-    <button id="btnReset">RESET</button>
+  <div class="card section">
+    <h2>Số đếm sản phẩm</h2>
+    <div>Box 1: <span id="counter1">0</span></div>
+    <div>Box 2: <span id="counter2">0</span></div>
+  </div>
+
+  <div class="card section">
+    <h2>Điều khiển Stepper</h2>
+    <button id="btnLeft">QUAY TRÁI</button>
+    <button id="btnRight">QUAY PHẢI</button>
+  </div>
+
+  <div class="card section">
+    <h2>Điều khiển cửa</h2>
+    <button id="btnOpen">MỞ CỬA</button>
+    <button id="btnClose" class="off">ĐÓNG CỬA</button>
+  </div>
+
+  <div class="card section">
+    <h2>RESET</h2>
+    <button id="btnReset" class="off">RESET</button>
   </div>
 
   <script>
     // ⚙️ Cấu hình Firebase
     const firebaseConfig = {
-      apiKey: "AIzaSyA-YOUR_KEY",
+      apiKey: "diep-755df.firebaseapp.com",
       authDomain: "diep-755df.firebaseapp.com",
       databaseURL: "https://diep-755df-default-rtdb.firebaseio.com",
       projectId: "diep-755df",
@@ -71,17 +92,46 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 🔁 Theo dõi giá trị bộ đếm
-    db.ref("dem").on("value", (snapshot) => {
-      document.getElementById("counter").innerText = snapshot.val();
+    // 🔁 Theo dõi số đếm Box1 & Box2
+    db.ref("box1").on("value", snapshot => {
+      document.getElementById("counter1").innerText = snapshot.val();
+    });
+    db.ref("box2").on("value", snapshot => {
+      document.getElementById("counter2").innerText = snapshot.val();
     });
 
-    // 💡 Bật / Tắt quạt
-    document.getElementById("btnOn").onclick = () => db.ref("led").set(1);
-    document.getElementById("btnOff").onclick = () => db.ref("led").set(0);
+    // 🌐 Chế độ AUTO / MANUAL
+    const btnAuto = document.getElementById("btnAuto");
+    const btnManual = document.getElementById("btnManual");
+
+    btnAuto.onclick = () => {
+      db.ref("mode").set(0);
+      btnAuto.classList.remove("off");
+      btnManual.classList.add("off");
+    };
+    btnManual.onclick = () => {
+      db.ref("mode").set(1);
+      btnManual.classList.remove("off");
+      btnAuto.classList.add("off");
+    };
+
+    // 💡 Điều khiển Stepper
+    document.getElementById("btnLeft").onclick = () => db.ref("stepper_cmd").set(-1);
+    document.getElementById("btnRight").onclick = () => db.ref("stepper_cmd").set(1);
+
+    // 🏠 Điều khiển cửa DC
+    document.getElementById("btnOpen").onclick = () => db.ref("door").set(1);
+    document.getElementById("btnClose").onclick = () => db.ref("door").set(0);
 
     // 🔄 Reset bộ đếm
     document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
+
+    // 🔁 Đồng bộ trạng thái chế độ khi load trang
+    db.ref("mode").on("value", snapshot => {
+      const mode = snapshot.val();
+      if (mode == 0) { btnAuto.classList.remove("off"); btnManual.classList.add("off"); }
+      else { btnManual.classList.remove("off"); btnAuto.classList.add("off"); }
+    });
   </script>
 </body>
 </html>
