@@ -6,132 +6,197 @@
   <title>Bảng điều khiển ESP32</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: #f8f9fa;
+      background: #eef2f7;
       margin: 0;
       padding: 40px;
     }
-    h1 { color: #007BFF; }
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 20px;
-      display: inline-block;
-      min-width: 320px;
-      margin-bottom: 20px;
+    h1 { color: #0066cc; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 360px;
+      margin: auto;
     }
+
+    .full { grid-column: span 2; }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+      padding: 15px;
+    }
+
     button {
-      padding: 10px 20px;
-      margin: 5px;
+      padding: 12px 20px;
+      margin: 6px;
       border: none;
-      border-radius: 6px;
-      background: #007BFF;
+      border-radius: 8px;
+      background: #007bff;
       color: white;
       font-size: 16px;
       cursor: pointer;
+      transition: 0.25s;
     }
-    button.off { background: #dc3545; }
+
+    button.off { background: #d9534f; }
+
     button.mode { width: 100px; }
+
     #counter1, #counter2 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: bold;
-      margin: 10px 0;
       color: #28a745;
     }
-    .section { margin-bottom: 20px; }
+
+    .control-btn {
+      width: 130px;
+      padding: 12px;
+      margin: 6px;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #007bff;
+      color: white;
+      transition: 0.25s;
+    }
+
+    .control-btn.off { background: #d9534f; }
+
+    #btnOpen, #btnClose {
+      width: 150px;
+      display: inline-block;
+    }
+
+    button:hover { opacity: 0.9; transform: translateY(-2px); }
+    button:active { transform: scale(0.95); opacity: 0.75; }
+
   </style>
 </head>
+
 <body>
-  <h1>Bảng điều khiển ESP32 - NGUYỄN ĐÌNH ĐIỆP</h1>
 
-  <div class="card section">
-    <h2>Chế độ hoạt động</h2>
-    <button id="btnAuto" class="mode">AUTO</button>
-    <button id="btnManual" class="mode off">MANUAL</button>
+  <h1>Bảng điều khiển hệ thống phân loại</h1>
+
+  <div class="grid">
+
+    <!-- HÀNG 1 -->
+    <div class="card">
+      <h3>Chế độ</h3>
+      <button id="btnAuto" class="mode">AUTO</button>
+      <button id="btnManual" class="mode off">MANUAL</button>
+    </div>
+
+    <div class="card">
+      <h3>Số đếm</h3>
+      Box 1: <span id="counter1">0</span><br>
+      Box 2: <span id="counter2">0</span>
+    </div>
+
+    <!-- HÀNG 2 -->
+    <div class="card">
+      <h3>Điều khiển cửa</h3>
+      <button id="btnOpen" class="control-btn">MỞ CỬA</button>
+      <button id="btnClose" class="control-btn off">ĐÓNG CỬA</button>
+    </div>
+
+    <div class="card">
+      <h3>Stepper</h3>
+      <button id="btnLeft" class="control-btn">QUAY TRÁI</button>
+      <button id="btnRight" class="control-btn off">QUAY PHẢI</button>
+    </div>
+
+    <!-- HÀNG 3 -->
+    <div class="card full">
+      <h3>RESET</h3>
+      <button id="btnReset" class="off">RESET</button>
+    </div>
+
   </div>
 
-  <div class="card section">
-    <h2>Số đếm sản phẩm</h2>
-    <div>Box 1: <span id="counter1">0</span></div>
-    <div>Box 2: <span id="counter2">0</span></div>
-  </div>
+<script>
+const firebaseConfig = {
+  apiKey: "diep-755df.firebaseapp.com",
+  authDomain: "diep-755df.firebaseapp.com",
+  databaseURL: "https://diep-755df-default-rtdb.firebaseio.com",
+  projectId: "diep-755df",
+  storageBucket: "diep-755df.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 
-  <div class="card section">
-    <h2>Điều khiển Stepper</h2>
-    <button id="btnLeft">QUAY TRÁI</button>
-    <button id="btnRight">QUAY PHẢI</button>
-  </div>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  <div class="card section">
-    <h2>Điều khiển cửa</h2>
-    <button id="btnOpen">MỞ CỬA</button>
-    <button id="btnClose" class="off">ĐÓNG CỬA</button>
-  </div>
+// ---------- COUNTER ----------
+db.ref("box1").on("value", snap => {
+  document.getElementById("counter1").innerText = snap.val();
+});
+db.ref("box2").on("value", snap => {
+  document.getElementById("counter2").innerText = snap.val();
+});
 
-  <div class="card section">
-    <h2>RESET</h2>
-    <button id="btnReset" class="off">RESET</button>
-  </div>
-
-  <script>
-    // ⚙️ Cấu hình Firebase
-    const firebaseConfig = {
-      apiKey: "diep-755df.firebaseapp.com",
-      authDomain: "diep-755df.firebaseapp.com",
-      databaseURL: "https://diep-755df-default-rtdb.firebaseio.com",
-      projectId: "diep-755df",
-      storageBucket: "diep-755df.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // 🔁 Theo dõi số đếm Box1 & Box2
-    db.ref("box1").on("value", snapshot => {
-      document.getElementById("counter1").innerText = snapshot.val();
-    });
-    db.ref("box2").on("value", snapshot => {
-      document.getElementById("counter2").innerText = snapshot.val();
-    });
-
-    // 🌐 Chế độ AUTO / MANUAL
-    const btnAuto = document.getElementById("btnAuto");
+// ---------- MODE ----------
+const btnAuto   = document.getElementById("btnAuto");
 const btnManual = document.getElementById("btnManual");
 
-    btnAuto.onclick = () => {
-      db.ref("mode").set(0);
-      btnAuto.classList.remove("off");
-      btnManual.classList.add("off");
-    };
-    btnManual.onclick = () => {
-      db.ref("mode").set(1);
-      btnManual.classList.remove("off");
-      btnAuto.classList.add("off");
-    };
+btnAuto.onclick = () => {
+  db.ref("mode").set(0);
+  btnAuto.classList.remove("off");
+  btnManual.classList.add("off");
+};
 
-    // 💡 Điều khiển Stepper
-    document.getElementById("btnLeft").onclick = () => db.ref("stepper_cmd").set(-1);
-    document.getElementById("btnRight").onclick = () => db.ref("stepper_cmd").set(1);
+btnManual.onclick = () => {
+  db.ref("mode").set(1);
+  btnManual.classList.remove("off");
+  btnAuto.classList.add("off");
+};
 
-    // 🏠 Điều khiển cửa DC
-    document.getElementById("btnOpen").onclick = () => db.ref("door").set(1);
-    document.getElementById("btnClose").onclick = () => db.ref("door").set(0);
+db.ref("mode").on("value", snap => {
+  let mode = snap.val();
+  if (mode == 0) {
+    btnAuto.classList.remove("off");
+    btnManual.classList.add("off");
+  } else {
+    btnManual.classList.remove("off");
+    btnAuto.classList.add("off");
+  }
+});
 
-    // 🔄 Reset bộ đếm
-    document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
+// ---------- DOOR (MỖI LẦN NHẤN CHỈ CHẠY 1 LẦN) ----------
+document.getElementById("btnOpen").onclick = () => {
+  db.ref("door").set(1);
+  setTimeout(() => db.ref("door").set(0), 300); // reset
+};
 
-    // 🔁 Đồng bộ trạng thái chế độ khi load trang
-    db.ref("mode").on("value", snapshot => {
-      const mode = snapshot.val();
-      if (mode == 0) { btnAuto.classList.remove("off"); btnManual.classList.add("off"); }
-      else { btnManual.classList.remove("off"); btnAuto.classList.add("off"); }
-    });
-  </script>
+document.getElementById("btnClose").onclick = () => {
+  db.ref("door").set(2);
+  setTimeout(() => db.ref("door").set(0), 300); // reset
+};
+
+// ---------- STEPPER (MỖI LẦN NHẤN CHỈ QUAY 1 LẦN) ----------
+document.getElementById("btnLeft").onclick = () => {
+  db.ref("stepper_cmd").set(-1);
+  setTimeout(() => db.ref("stepper_cmd").set(0), 300); // reset
+};
+
+document.getElementById("btnRight").onclick = () => {
+  db.ref("stepper_cmd").set(1);
+  setTimeout(() => db.ref("stepper_cmd").set(0), 300); // reset
+};
+
+// ---------- RESET ----------
+document.getElementById("btnReset").onclick = () => {
+  db.ref("reset").set(1);
+  setTimeout(() => db.ref("reset").set(0), 300);
+};
+</script>
+
 </body>
 </html>
