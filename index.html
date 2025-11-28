@@ -33,9 +33,7 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.12);
       padding: 15px;
     }
-    .card #btnRight{
-      background-color: #d9534f;
-    }
+
     /* ===== BASE BUTTON ===== */
     button {
       padding: 12px 20px;
@@ -62,7 +60,7 @@
       color: #28a745;
     }
 
-    /* ===== UNIFORM BUTTONS FOR DOOR & STEPPER ===== */
+    /* ===== UNIFORM BUTTONS ===== */
     .control-btn {
       width: 130px;
       padding: 12px;
@@ -78,24 +76,21 @@
       background: #d9534f;
     }
 
+    /* === Cửa: ép 2 nút bằng nhau === */
+    #btnOpen, #btnClose {
+      width: 150px;   /* chỉnh kích thước ở đây */
+      display: inline-block;
+    }
+
     /* Hover */
-    .control-btn:hover,
     button:hover {
       opacity: 0.9;
       transform: translateY(-2px);
     }
 
-    /* Khi nhấn */
-    .control-btn:active,
     button:active {
       transform: scale(0.95);
       opacity: 0.75;
-    }
-
-    /* ===== ACTIVE BUTTON STYLE ===== */
-    .active-btn {
-      background: #17b817 !important;
-      box-shadow: 0 0 10px rgba(23,162,184,0.8);
     }
 
   </style>
@@ -103,7 +98,7 @@
 
 <body>
 
-  <h1>Bảng điều khiển hệ thống phân loại </h1>
+  <h1>Bảng điều khiển hệ thống phân loại</h1>
 
   <div class="grid">
 
@@ -130,7 +125,7 @@
     <div class="card">
       <h3>Stepper</h3>
       <button id="btnLeft" class="control-btn">QUAY TRÁI</button>
-      <button id="btnRight" class="control-btn">QUAY PHẢI</button>
+      <button id="btnRight" class="control-btn off">QUAY PHẢI</button>
     </div>
 
     <!-- HÀNG 3 -->
@@ -190,42 +185,22 @@ db.ref("mode").on("value", snap => {
   }
 });
 
-// ----- ACTIVE FUNCTION -----
-function setActive(list, activeBtn) {
-  list.forEach(b => b.classList.remove("active-btn"));
-  activeBtn.classList.add("active-btn");
-}
-
-// ----- DOOR -----
-const btnOpen  = document.getElementById("btnOpen");
-const btnClose = document.getElementById("btnClose");
-
-const doorButtons = [btnOpen, btnClose];
-
-btnOpen.onclick = () => {
+// ----- DOOR (KHÔNG GIỮ TRẠNG THÁI) -----
+document.getElementById("btnOpen").onclick = () => {
   db.ref("door").set(1);
-  setActive(doorButtons, btnOpen);
 };
 
-btnClose.onclick = () => {
+document.getElementById("btnClose").onclick = () => {
   db.ref("door").set(0);
-  setActive(doorButtons, btnClose);
 };
 
-// ----- STEPPER -----
-const btnLeft  = document.getElementById("btnLeft");
-const btnRight = document.getElementById("btnRight");
-
-const stepperButtons = [btnLeft, btnRight];
-
-btnLeft.onclick = () => {
+// ----- STEPPER (KHÔNG GIỮ TRẠNG THÁI) -----
+document.getElementById("btnLeft").onclick = () => {
   db.ref("stepper_cmd").set(-1);
-  setActive(stepperButtons, btnLeft);
 };
 
-btnRight.onclick = () => {
+document.getElementById("btnRight").onclick = () => {
   db.ref("stepper_cmd").set(1);
-  setActive(stepperButtons, btnRight);
 };
 
 // ----- RESET -----
