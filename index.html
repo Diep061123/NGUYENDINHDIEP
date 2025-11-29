@@ -6,6 +6,7 @@
   <title>Bảng điều khiển ESP32</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -36,17 +37,22 @@
     }
     button.off { background: #dc3545; }
     button.mode { width: 100px; }
+
     #counter1, #counter2 {
       font-size: 28px;
       font-weight: bold;
       margin: 10px 0;
       color: #28a745;
     }
+
     .section { margin-bottom: 20px; }
   </style>
 </head>
 <body>
-  <h1>Bảng điều khiển ESP32 - NGUYỄN ĐÌNH ĐIỆP</h1>
+
+<h1>Bảng điều khiển hệ thống phân loại</h1>
+
+  <h1>Bảng điều khiển hệ thống phân loại</h1>
 
   <div class="card section">
     <h2>Chế độ hoạt động</h2>
@@ -69,7 +75,7 @@
   <div class="card section">
     <h2>Điều khiển cửa</h2>
     <button id="btnOpen">MỞ CỬA</button>
-    <button id="btnClose" class="off">ĐÓNG CỬA</button>
+    <button id="btnClose">ĐÓNG CỬA</button>
   </div>
 
   <div class="card section">
@@ -93,45 +99,59 @@
     const db = firebase.database();
 
     // 🔁 Theo dõi số đếm Box1 & Box2
-    db.ref("box1").on("value", snapshot => {
-      document.getElementById("counter1").innerText = snapshot.val();
+    db.ref("box1").on("value", s => {
+      document.getElementById("counter1").innerText = s.val();
     });
-    db.ref("box2").on("value", snapshot => {
-      document.getElementById("counter2").innerText = snapshot.val();
+    db.ref("box2").on("value", s => {
+      document.getElementById("counter2").innerText = s.val();
     });
 
     // 🌐 Chế độ AUTO / MANUAL
     const btnAuto = document.getElementById("btnAuto");
-const btnManual = document.getElementById("btnManual");
+    const btnManual = document.getElementById("btnManual");
 
     btnAuto.onclick = () => {
       db.ref("mode").set(0);
       btnAuto.classList.remove("off");
       btnManual.classList.add("off");
     };
+
     btnManual.onclick = () => {
       db.ref("mode").set(1);
       btnManual.classList.remove("off");
       btnAuto.classList.add("off");
     };
 
-    // 💡 Điều khiển Stepper
-    document.getElementById("btnLeft").onclick = () => db.ref("stepper_cmd").set(-1);
-    document.getElementById("btnRight").onclick = () => db.ref("stepper_cmd").set(1);
+    // 💡 Điều khiển Stepper (ĐÃ SỬA)
+    document.getElementById("btnLeft").onclick = () => {
+      db.ref("stepper_cmd").set(-1);
+      setTimeout(() => db.ref("stepper_cmd").set(0), 300);
+    };
+
+    document.getElementById("btnRight").onclick = () => {
+      db.ref("stepper_cmd").set(1);
+      setTimeout(() => db.ref("stepper_cmd").set(0), 300);
+    };
 
     // 🏠 Điều khiển cửa DC
-    document.getElementById("btnOpen").onclick = () => db.ref("door").set(1);
+    document.getElementById("btnOpen").onclick  = () => db.ref("door").set(1);
     document.getElementById("btnClose").onclick = () => db.ref("door").set(0);
 
     // 🔄 Reset bộ đếm
     document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
 
-    // 🔁 Đồng bộ trạng thái chế độ khi load trang
-    db.ref("mode").on("value", snapshot => {
-      const mode = snapshot.val();
-      if (mode == 0) { btnAuto.classList.remove("off"); btnManual.classList.add("off"); }
-      else { btnManual.classList.remove("off"); btnAuto.classList.add("off"); }
+    // 🔁 Đồng bộ khi load trang
+    db.ref("mode").on("value", s => {
+      const mode = s.val();
+      if (mode == 0) {
+        btnAuto.classList.remove("off");
+        btnManual.classList.add("off");
+      } else {
+        btnManual.classList.remove("off");
+        btnAuto.classList.add("off");
+      }
     });
   </script>
+
 </body>
 </html>
