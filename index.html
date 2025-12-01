@@ -44,13 +44,16 @@
       margin: 10px 0;
       color: #28a745;
     }
-
     .section { margin-bottom: 20px; }
   </style>
 </head>
 <body>
 
-<h1>Bảng điều khiển hệ thống phân loại</h1>
+  <!-- 🔵 ẢNH BANNER BÊN TRÊN TIÊU ĐỀ -->
+  <!-- Ảnh banner.png phải nằm cùng thư mục với index.html -->
+  <img src="banner.png" 
+       alt="Logo Đại học Thủy Lợi - Khoa Cơ Khí"
+       style="width: 60%; max-width: 900px; margin-bottom: 25px;">
 
   <h1>Bảng điều khiển hệ thống phân loại</h1>
 
@@ -84,7 +87,6 @@
   </div>
 
   <script>
-    // ⚙️ Cấu hình Firebase
     const firebaseConfig = {
       apiKey: "diep-755df.firebaseapp.com",
       authDomain: "diep-755df.firebaseapp.com",
@@ -98,7 +100,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // 🔁 Theo dõi số đếm Box1 & Box2
     db.ref("box1").on("value", s => {
       document.getElementById("counter1").innerText = s.val();
     });
@@ -106,7 +107,6 @@
       document.getElementById("counter2").innerText = s.val();
     });
 
-    // 🌐 Chế độ AUTO / MANUAL
     const btnAuto = document.getElementById("btnAuto");
     const btnManual = document.getElementById("btnManual");
 
@@ -122,25 +122,20 @@
       btnAuto.classList.add("off");
     };
 
-    // 💡 Điều khiển Stepper (ĐÃ SỬA)
     document.getElementById("btnLeft").onclick = () => {
       db.ref("stepper_cmd").set(-1);
       setTimeout(() => db.ref("stepper_cmd").set(0), 300);
     };
-
     document.getElementById("btnRight").onclick = () => {
       db.ref("stepper_cmd").set(1);
       setTimeout(() => db.ref("stepper_cmd").set(0), 300);
     };
 
-    // 🏠 Điều khiển cửa DC
     document.getElementById("btnOpen").onclick  = () => db.ref("door").set(1);
     document.getElementById("btnClose").onclick = () => db.ref("door").set(0);
 
-    // 🔄 Reset bộ đếm
     document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
 
-    // 🔁 Đồng bộ khi load trang
     db.ref("mode").on("value", s => {
       const mode = s.val();
       if (mode == 0) {
