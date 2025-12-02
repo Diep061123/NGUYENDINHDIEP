@@ -124,11 +124,11 @@
 
     document.getElementById("btnLeft").onclick = () => {
       db.ref("stepper_cmd").set(-1);
-      setTimeout(() => db.ref("stepper_cmd").set(0), 300);
+      setTimeout(() => db.ref("stepper_cmd").set(0), 1500);
     };
     document.getElementById("btnRight").onclick = () => {
       db.ref("stepper_cmd").set(1);
-      setTimeout(() => db.ref("stepper_cmd").set(0), 300);
+      setTimeout(() => db.ref("stepper_cmd").set(0), 1500);
     };
 
     document.getElementById("btnOpen").onclick  = () => db.ref("door").set(1);
