@@ -16,15 +16,30 @@
       padding: 40px;
     }
     h1 { color: #007BFF; }
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 20px;
-      display: inline-block;
-      min-width: 320px;
-      margin-bottom: 20px;
+
+    .row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      margin-bottom: 30px;
     }
+
+.card {
+  background: #f0d4d4;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  width: 280px;              /* 👈 nhỏ hơn */
+  height: 170px;             /* 👈 nhỏ hơn */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
     button {
       padding: 10px 20px;
       margin: 5px;
@@ -44,7 +59,6 @@
       margin: 10px 0;
       color: #28a745;
     }
-    .section { margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -52,44 +66,52 @@
   <!-- Banner -->
   <img src="banner.png" 
        alt="Logo Đại học Thủy Lợi - Khoa Cơ Khí"
-       style="width: 60%; max-width: 900px; margin-bottom: 25px;">
+       style="width: 50%; max-width: 900px; margin-bottom: 25px;">
 
   <h1>Bảng điều khiển hệ thống phân loại</h1>
 
+  <!-- ======= HÀNG TRÊN ======= -->
+  <!-- ======= HÀNG TRÊN (ĐÃ ĐỔI) ======= -->
+<div class="row">
+
   <!-- Chế độ -->
-  <div class="card section">
+  <div class="card">
     <h2>Chế độ hoạt động</h2>
     <button id="btnAuto" class="mode">AUTO</button>
     <button id="btnManual" class="mode off">MANUAL</button>
   </div>
 
-  <!-- Số đếm -->
-  <div class="card section">
-    <h2>Số đếm sản phẩm</h2>
-    <div>Box 1: <span id="counter1">0</span></div>
-    <div>Box 2: <span id="counter2">0</span></div>
-  </div>
-
-  <!-- Điều khiển Stepper -->
-  <div class="card section">
-    <h2>Điều khiển Stepper</h2>
-    <button id="btnLeft">QUAY TRÁI</button>
-    <button id="btnStop" class="off">DỪNG</button>
-    <button id="btnRight">QUAY PHẢI</button>
-  </div>
-
-  <!-- Điều khiển cửa -->
-  <div class="card section">
+  <!-- Điều khiển cửa (ĐỔI LÊN) -->
+  <div class="card">
     <h2>Điều khiển cửa</h2>
     <button id="btnOpen">MỞ CỬA</button>
     <button id="btnClose">ĐÓNG CỬA</button>
   </div>
 
-  <!-- Reset -->
-  <div class="card section">
-    <h2>RESET</h2>
+</div>
+
+
+<!-- ======= HÀNG DƯỚI (ĐÃ ĐỔI) ======= -->
+<div class="row">
+
+  <!-- Số đếm sản phẩm (ĐỔI XUỐNG) -->
+  <div class="card">
+    <h2>Số đếm sản phẩm</h2>
+    <div>CHAI: <span id="counter1">0</span></div>
+    <div>LON: <span id="counter2">0</span></div>
     <button id="btnReset" class="off">RESET</button>
   </div>
+
+  <!-- Điều khiển Stepper -->
+  <div class="card">
+    <h2>Điều khiển Stepper</h2>
+    <button id="btnLeft">QUAY TRÁI</button>
+    <button id="btnRight">QUAY PHẢI</button>
+    <button id="btnStop" class="off">DỪNG</button>
+  </div>
+
+</div>
+
 
   <script>
     const firebaseConfig = {
@@ -133,11 +155,9 @@
     document.getElementById("btnLeft").onclick = () => {
       db.ref("stepper_cmd").set(-1);
     };
-
     document.getElementById("btnRight").onclick = () => {
       db.ref("stepper_cmd").set(1);
     };
-
     document.getElementById("btnStop").onclick = () => {
       db.ref("stepper_cmd").set(0);
     };
@@ -149,7 +169,7 @@
     // Reset
     document.getElementById("btnReset").onclick = () => db.ref("reset").set(1);
 
-    // Đồng bộ giao diện chế độ
+    // Đồng bộ giao diện
     db.ref("mode").on("value", s => {
       const mode = s.val();
       if (mode == 0) {
